@@ -15,7 +15,7 @@ sort_by = "weight"
 >  **Nomicon** {{ nom(page="")}},
 >  **Reference** {{ ref(page="")}}.
 
-### Program Structure
+### Data Structure
 
 Structural composition of entities.
 
@@ -23,25 +23,57 @@ Structural composition of entities.
 
 | Sigil | Explanation |
 |---------|-------------|
+| `static X`  | **Global variable** {{ book(page="ch19-01-unsafe-rust.html#accessing-or-modifying-a-mutable-static-variable") }} {{ ex(page="custom_types/constants.html#constants") }} {{ ref(page="items/static-items.html#static-items") }}  with `'static` lifetime. |
 | `const X: T = x;`  | Define a **constant**. {{ book(page="ch03-01-variables-and-mutability.html#differences-between-variables-and-constants") }} {{ ex(page="custom_types/constants.html") }} {{ ref(page="items/constant-items.html") }} |
-| `extern crate x`  | Declare dependency on external **crate**. {{ book(page="ch02-00-guessing-game-tutorial.html#using-a-crate-to-get-more-functionality") }} {{ ex(page="crates/link.html#extern-crate") }} {{ ref(page="items/extern-crates.html#extern-crate-declarations") }}|
 | `enum E {}` | Define an **enum** {{ book(page="ch06-01-defining-an-enum.html") }} {{ ex(page="custom_types/enum.html#enums") }} {{ ref(page="items/enumerations.html") }} , _c_. [algebraic data types](https://en.wikipedia.org/wiki/Algebraic_data_type). |
-| `fn f() -> T {}`  | Define a function. |
-| `fn() -> T`  | **Function pointers**. {{ book(page="ch19-05-advanced-functions-and-closures.html#function-pointers") }} {{ std(page="std/primitive.fn.html") }} {{ ref(page="types.html#function-pointer-types") }} |
+| `struct S;` | Define a structure. |
+| `type T = S;`  | Create a **type alias**. {{ book(page="ch19-04-advanced-types.html#creating-type-synonyms-with-type-aliases") }} |
+| `type X;`  | Create an **associated type** {{ book(page="ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types") }} {{ ref(page="items/associated-items.html#associated-types") }} for a trait. |
+| `union U {}` | Unsafe **union**  {{ ref(page="items/unions.html") }} for FFI compatibility. |
+| `let x`;  | Bind a variable. |
+| `mut x`  | Denote mutability. |
+| `trait T {}`  | Define a trait. |
+
+</div>
+
+### Compositional Structure
+
+Structural composition of entities.
+
+<div class="cheats">
+
+| Sigil | Explanation |
+|---------|-------------|
+| `extern crate x`  | Declare dependency on external **crate**. {{ book(page="ch02-00-guessing-game-tutorial.html#using-a-crate-to-get-more-functionality") }} {{ ex(page="crates/link.html#extern-crate") }} {{ ref(page="items/extern-crates.html#extern-crate-declarations") }}|
+| `extern "C" fn`  | External dependency for **FFI**. {{ book(page="ch19-01-unsafe-rust.html#using-extern-functions-to-call-external-code") }} {{ ex(page="std_misc/ffi.html#foreign-function-interface") }} {{ nom(page="ffi.html#calling-foreign-functions") }} {{ ref(page="items/external-blocks.html#external-blocks") }} |
+| `mod m {}`  | Define a **module**. {{ book(page="ch07-00-modules.html") }} {{ ex(page="mod.html#modules") }} {{ ref(page="items/modules.html#modules") }} |
 | `pub T`  | "Public if parent path public" **visibility** {{ book(page="ch07-02-controlling-visibility-with-pub.html#controlling-visibility-with-pub") }} {{ ex(page="mod/visibility.html#visibility") }} {{ ref(page="visibility-and-privacy.html#visibility-and-privacy") }}. |
 | `pub(crate) T` | Visibility at most in current crate, _c_. `pub`. |
 | `pub(self)`  | Visible in current module, _c_. `pub`. |
+| `pub(super)`  | Visible at most in parent, _c_. `pub`. |
 | `pub(in a::b) T`  | Visible at most in `a::b`, _c_. `pub`. |
-| `struct S;` | Define a structure. |
 | `super::x`  | Path to parent module of the current module. |
 | `self`  | Refer to method subject. |
+| `self::x`  | Refer to current module. |
 | `Self`  | Type alias for current type, e.g. `fn new() -> Self`. |
-| `type T = S;`  | Create a **type alias**. {{ book(page="ch19-04-advanced-types.html#creating-type-synonyms-with-type-aliases") }} |
-| `union U {}` | Unsafe **union**  {{ ref(page="items/unions.html") }} for FFI compatibility. |
 | `use a::b`  | Bring symbol into scope. |
+| `a::b` | Namespace **path**. {{ book(page="ch07-03-importing-names-with-use.html") }} {{ ex(page="mod/use.html") }} {{ ref(page="paths.html")}} |
+
+</div>
+
+
+### Execution Structure
+
+Structural composition of entities.
+
+<div class="cheats">
+
+| Sigil | Explanation |
+|---------|-------------|
+| `fn f() -> T {}`  | Define a function. |
+| `fn() -> T`  | **Function pointers**. {{ book(page="ch19-05-advanced-functions-and-closures.html#function-pointers") }} {{ std(page="std/primitive.fn.html") }} {{ ref(page="types.html#function-pointer-types") }} |
 | `impl T for S {}`  | Implement traits. |
 | `impl T {}`  | Implement functionality. |
-| `a::b` | Namespace **path**. {{ book(page="ch07-03-importing-names-with-use.html") }} {{ ex(page="mod/use.html") }} {{ ref(page="paths.html")}} |
 | <code>\|x\|</code> | Parameter binder for **closures**. {{ book(page="ch13-01-closures.html") }} {{ ex(page="fn/closures.html") }} {{ ref(page="expressions/closure-expr.html")}} |
 | `x;` | **Statement** {{ ref(page="statements.html")}} terminator, _c_. **expressions** {{ ex(page="expression.html") }} {{ ref(page="expressions.html")}} |
 
@@ -49,7 +81,7 @@ Structural composition of entities.
 
 
 
-### Execution Flow
+### Control Flow
 
 Ubiquitous constructs for code structure and execution flow.
 
@@ -279,26 +311,17 @@ For some of them Rust also support **operator overloading**. {{ std(page="std/op
 | ~ | `S as T`  | **Disambiguate** {{ book(page="ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name") }} {{ ref(page="expressions/call-expr.html#disambiguating-function-calls") }} type `S` as trait `T`. |
 | ~ |  `*const T` | Constant raw pointers, _c_. raw pointer. |
 | `dyn` |  `&dyn T` | Marker for **dynamic dispatch** {{ book(page="ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types") }} {{ ref(page="types.html#trait-objects") }}, _c_. `impl`. |
-| ~ | `extern "C" fn`  | External dependency for **FFI**. {{ book(page="ch19-01-unsafe-rust.html#using-extern-functions-to-call-external-code") }} {{ ex(page="std_misc/ffi.html#foreign-function-interface") }} {{ nom(page="ffi.html#calling-foreign-functions") }} {{ ref(page="items/external-blocks.html#external-blocks") }} |
 | `false` | `false`  | Boolean false literal. |
 | ~ | `for<'a>`  | **Higher-rank trait bounds.** {{ nom(page="hrtb.html")}} {{ ref(page="trait-bounds.html#higher-ranked-trait-bounds")}} |
 | ~ | `if let Some(x)`  | Branch if pattern can be assigned. {{ ref(page="expressions/if-expr.html#if-let-expressions") }} |
 | ~ | `P(X) if x > 10`  | Pattern match **guards**. {{ book(page="ch18-03-pattern-syntax.html#extra-conditionals-with-match-guards")}} {{ ex(page="flow_control/match/guard.html#guards")}} |
 | ~ | `fn f(x: impl T)`  | Trait bound,"**impl traits**" {{ book(page="ch10-02-traits.html#trait-bounds") }}, same {{todo()}} as `x: T`. |
 | ~ | `fn f() -> impl T`  | **Existential types** {{ book(page="ch10-02-traits.html#returning-traits") }}, returns `S` that `impl T`. |
-| `let` | `let x`;  | Bind a variable. |
 | `match` | `match m {}` | Initiate **pattern matching**. {{ book(page="ch06-02-match.html") }} {{ ex(page="flow_control/match.html") }} {{ ref(page="expressions/match-expr.html") }} |
-| `mod` | `mod m {}`  | Define a **module**. {{ book(page="ch07-00-modules.html") }} {{ ex(page="mod.html#modules") }} {{ ref(page="items/modules.html#modules") }} |
 | `move` | <code>move \|\| x + x </code> | Make a closure take ownership of all its captures. |
-| `mut` | `mut x`  | Denote mutability. |
 | `ref` | `ref x` | **Bind by reference**. {{ book(page="ch18-03-pattern-syntax.html#legacy-patterns-ref-and-ref-mut") }} {{ ex(page="scope/borrow/ref.html") }} |
-| ~ | `self::x`  | Refer to current module. |
-| `static` | `static X`  | **Global variable** {{ book(page="ch19-01-unsafe-rust.html#accessing-or-modifying-a-mutable-static-variable") }} {{ ex(page="custom_types/constants.html#constants") }} {{ ref(page="items/static-items.html#static-items") }}  with `'static` lifetime. |
 | ~ | `'static`  | Lifetime lasting the entire program execution. |
-| ~ | `pub(super)`  | Visible at most in parent, _c_. `pub`. |
-| `trait` | `trait T {}`  | Define a trait. |
 | `true` | `true`  | Boolean true literal. |
-| ~ | `type X;`  | Create an **associated type** {{ book(page="ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types") }} {{ ref(page="items/associated-items.html#associated-types") }} for a trait. |
 | `unsafe` |  `unsafe {}` | Marker for **unsafe code**. {{ book(page="ch19-01-unsafe-rust.html?highlight=unsafe#unsafe-superpowers") }} {{ ex(page="unsafe.html#unsafe-operations") }} {{ nom(page="meet-safe-and-unsafe.html") }} {{ ref(page="unsafe-blocks.html#unsafe-blocks") }} |
 | `where` | `where T: S`  | Introduce type constraints for generics. |
 
