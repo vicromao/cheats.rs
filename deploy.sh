@@ -29,13 +29,7 @@ function abort() {
     exit 1
 }
 
-
-# Make sure we _only_ allow final (packaged) files as S3 gets messy otherwise
-rm -rf "$FOLDER_PREP"; mkdir "$FOLDER_PREP";
-rm -rf "$FOLDER_DIST"; mkdir "$FOLDER_DIST";
-
-$ZOLA -c "$TOML_BASE" check || abort
-$ZOLA -c "$TOML_BASE" build || abort
+mkdir -p "$FOLDER_DIST"
 
 # Posthtml plugins being the pile of garbage they are, we need to manually copy files
 # to these paths (no, setting a HTML root and using proper paths does NOT work ...)
@@ -47,14 +41,10 @@ cp public/*.js public/faq
 # Now run Posthtml
 npm run posthtml || abort  # Cleanup and minify output
 
-# Write used zola version to help others reproduce builds
-$ZOLA --version >.zolaversion
-
 # Update deployment date in sitemap.xml
 sed -i -e "s/_NOW_SITEMAP_/$NOW_SITEMAP/g" "$FOLDER_PREP/sitemap.xml"
 sed -i -e "s/_NOW_HUMAN_/$NOW_HUMAN/g" "$FOLDER_PREP/index.html"
 sed -i -e "s/_GITHASH_/$GITHASH/g" "$FOLDER_PREP/index.html"
-
 
 # Only more expressly allowed files
 for item in ${FOLDER_DIST_WHITELIST[*]}
@@ -76,12 +66,12 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 # Publish
-scp -r public.clean/* rb@192.168.0.1:/data/sites/cheats.rs
+# scp -r public.clean/* rb@192.168.0.1:/data/sites/cheats.rs
 
-# Purge Cloudflare cache
-if [[ "$CLOUDFLARE_CHEATSRS_APITOKEN" ]]; then
-    echo -e "${_GREEN}Flushing cache${_NC} ..."
-    curl -X POST "https://api.cloudflare.com/client/v4/zones/8519d81efc8dff85af32fa0cf5f69949/purge_cache" -H "Authorization: Bearer ${CLOUDFLARE_CHEATSRS_APITOKEN}" -H "Content-Type: application/json" --data '{ "purge_everything": true }'
-else
-    echo -e "${_RED}No API token to flush cache. You must do that manually!${_NC}"
-fi
+# # Purge Cloudflare cache
+# if [[ "$CLOUDFLARE_CHEATSRS_APITOKEN" ]]; then
+#     echo -e "${_GREEN}Flushing cache${_NC} ..."
+#     curl -X POST "https://api.cloudflare.com/client/v4/zones/8519d81efc8dff85af32fa0cf5f69949/purge_cache" -H "Authorization: Bearer ${CLOUDFLARE_CHEATSRS_APITOKEN}" -H "Content-Type: application/json" --data '{ "purge_everything": true }'
+# else
+#     echo -e "${_RED}No API token to flush cache. You must do that manually!${_NC}"
+# fi
